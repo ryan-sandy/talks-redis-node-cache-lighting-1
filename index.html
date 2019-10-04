@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Multi-Server Caching: Node & Redis Lighting Talk 1</title>
+
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/monokai.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Multi Server Caching</h1>
+					<p><b>Node & Redis Lighting Talk 1</b></p>
+					<h2>
+						<div>By</div>
+						<div>Ryan Lee</div>
+					</h2>
+					<p><a href="https://ryansandy.com" target="_blank">ryansandy.com</a></p>
+					<p><a href="https://github.com/ryan-sandy" target="_blank">Github: ryan-sandy</a></p>
+				</section>
+				<section>
+					<h1>Overview</h1>
+					<ul>
+						<li>What is Redis?</li>
+						<li>Node.js Drivers</li>
+						<li>Basic Usage</li>
+						<li>Advanced Usage</li>
+					</ul>
+				</section>
+				<section>
+					<h1>What is Redis?</h1>
+					<ul>
+						<li>In-memory data structure store</li>
+						<li>Future Talks:</li>
+						<ul>
+							<li>Cache</li>
+							<li>Event Emitter</li>
+							<li>Queue</li>
+						</ul>
+						<li>More Info:<a href="https://redis.io/" target="_blank">Redis.io</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Redis & Node</h1>
+					<ul>
+						<li><a href="http://redis.js.org/" target="_blank">redis</a></li>
+						<ul>
+							<li><a href="https://github.com/redis/hiredis-node" target="_blank">hireids</a> for C++ bindings</li>
+						</ul>
+					</ul>
+				</section>
+        <section>
+          <h2>Simple Example</h2>
+          <pre><code class="javascript" data-trim contenteditable>
+var redisDriver = require('redis');
+var redis = redisDriver.createClient();
+
+redis.set("forever", "forever-value", function (err) {
+  redis.get("forever", function (err, val) {
+    console.log(val);
+    redis.end();
+  });
+});
+          </code></pre>
+          <pre class="fragment"><code class="text" data-trim contenteditable>
+            forever-value
+          </code></pre>
+        </section>
+				<section>
+          <h2>Cache</h2>
+					<pre><code class="javascript" data-trim contenteditable>
+var redisDriver = require('redis');
+var redis = redisDriver.createClient();
+
+redis.setex("expires", 1, "seconds", function (err) {
+  redis.get("expires", function (err, val) {
+    console.log(val);
+  });
+
+  setTimeout(function () {
+    redis.get("expires", function (err, val) {
+      console.log(val);
+      redis.end();
+    });
+  }, 1500);
+});
+          </code></pre>
+					<pre class="fragment"><code class="text" data-trim contenteditable>
+seconds
+          </code>
+					<code class="text fragment" data-trim contenteditable>
+null
+          </code></pre>
+        </section>
+				<section>
+					<h2>Cookie Store</h2>
+					<ul>
+						<li>Express-session</li>
+						<li>connect-redis</li>
+					</ul>
+				</section>
+			</div>
+		</div>
+
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true }
+				]
+			});
+		</script>
+	</body>
+</html>
